@@ -19,19 +19,8 @@ def read_file(energy_valor, path):
         return energy_valor * np.exp(-d[energy_valor])
     else:
         data = np.array(list(d.items()))
-        aux1 = data[:,0]
-        print(aux1.shape)
-        aux2 = data[:,1]
-        print(aux2.shape)
-        
         f = interpolate.interp1d(data[:,0], data[:,1])
-        ynew = f(energy_valor)   # use interpolation function returned by `interp1d`
-        print(ynew)
-
-        xnew = np.arange(1, 20000, 1)
-        plt.plot(aux1, aux2, 'o', xnew, f(xnew), '-')
-        plt.show()
-
+        return(f(energy_valor))
 
 def cube_phantom(size,energy):
     return None
