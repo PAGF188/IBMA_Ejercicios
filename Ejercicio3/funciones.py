@@ -16,11 +16,11 @@ def read_file(energy_valor, path):
             d[float(aux[0])] = float(aux[1].split("\n")[0])
             
     if energy_valor in d.keys():
-        return energy_valor * np.exp(-d[energy_valor])
+        return d[energy_valor]
     else:
         data = np.array(list(d.items()))
         f = interpolate.interp1d(data[:,0], data[:,1])
-        return(f(energy_valor))
+        return f(energy_valor)
 
 def cube_phantom(size,energy):
     return None
@@ -31,5 +31,7 @@ def breast_phantom(size,energy):
 def vascular_phantom(size,energy):
     return None
 
-a = read_file(175,'./coefs/coefAtenuacionAdipose.csv')
-print(a)
+print(read_file(40,'./coefs/coefAtenuacionAir.csv'))
+print(read_file(40,'./coefs/coefAtenuacionAdipose.csv'))
+print(read_file(40,'./coefs/coefAtenuacionBreast.csv'))
+print(read_file(40,'./coefs/coefAtenuacionSoft.csv'))
