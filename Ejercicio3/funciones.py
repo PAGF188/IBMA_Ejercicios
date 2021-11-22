@@ -36,9 +36,18 @@ def vascular_phantom(size,energy):
     coef_soft = read_file(energy,'./coefs/coefAtenuacionSoft.csv')
     coef_blood = read_file(energy,'./coefs/coefAtenuacionBlood.csv')
 
-    phantom = np.full((size,size,size),coef_soft)
+    # Meshgrid para dibujar cilindro en 3D
+    xx, yy, zz = np.mgrid[:size, :size, :size]
+    circle = (xx - size//2+zz) ** 2 + (yy - size//2+zz) ** 2
     
-    return None
+    # Determinar su radio como el espacio que se quiere dejar en los bordes.
+    RADIO_UMBRAL = circle[int(0.2 * size), int(0.2 * size),0] 
+
+    # Ponemos los puntos del cilindro a "coef_blood" y el resto a "coef_soft"
+    phantom = np.full((size,size,size),coef_soft)
+    phantom[np.where(circle<=RADIO_UMBRAL)] = coef_blood
+
+    return phantom
 
 print(read_file(40,'./coefs/coefAtenuacionAir.csv'))
 print(read_file(40,'./coefs/coefAtenuacionAdipose.csv'))
@@ -48,3 +57,5 @@ print(read_file(40,'./coefs/coefAtenuacionBlood.csv'))
 
 
 vascular_phantom(256,40)
+vascular_phantom(11,40)
+vascular_phantom(100,40)
