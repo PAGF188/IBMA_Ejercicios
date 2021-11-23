@@ -1,8 +1,6 @@
 import numpy as np
-from sklearn.linear_model import LinearRegression
 import pdb
 from scipy import interpolate
-import matplotlib.pyplot as plt
 import os
 
 archivos = ["./coefs/*"]
@@ -55,10 +53,11 @@ def vascular_phantom(size,energy):
     # Meshgrid para dibujar cilindro en 3D
     xx, yy, zz = np.mgrid[:size, :size, :size]
     circle = (xx - size//2) ** 2 + (yy - size//2) ** 2
-    
+    pdb.set_trace()
     # Determinar su radio como el espacio que se quiere dejar en los bordes.
     # Since no dimensions are mentioned in statement, we assume:
-    RADIO_UMBRAL = circle[int(0.2 * size), int(0.2 * size),0] 
+    UMBRAL = 0.3
+    RADIO_UMBRAL = circle[int(UMBRAL * size), int(UMBRAL * size),0] 
 
     # Ponemos los puntos del cilindro a "coef_blood" y el resto a "coef_soft"
     phantom = np.full((size,size,size),coef_soft)
