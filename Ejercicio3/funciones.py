@@ -27,6 +27,7 @@ def read_file(energy_valor, path):
         return f(energy_valor)
 
 def cube_phantom(size,energy):
+
     return None
 
 def breast_phantom(size,energy):
