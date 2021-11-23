@@ -1,5 +1,4 @@
 import numpy as np
-import pdb
 from scipy import interpolate
 import os
 
@@ -53,7 +52,6 @@ def vascular_phantom(size,energy):
     # Meshgrid para dibujar cilindro en 3D
     xx, yy, zz = np.mgrid[:size, :size, :size]
     circle = (xx - size//2) ** 2 + (yy - size//2) ** 2
-    pdb.set_trace()
     # Determinar su radio como el espacio que se quiere dejar en los bordes.
     # Since no dimensions are mentioned in statement, we assume:
     UMBRAL = 0.3
