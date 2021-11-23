@@ -57,6 +57,7 @@ def vascular_phantom(size,energy):
     circle = (xx - size//2) ** 2 + (yy - size//2) ** 2
     
     # Determinar su radio como el espacio que se quiere dejar en los bordes.
+    # Since no dimensions are mentioned in statement, we assume:
     RADIO_UMBRAL = circle[int(0.2 * size), int(0.2 * size),0] 
 
     # Ponemos los puntos del cilindro a "coef_blood" y el resto a "coef_soft"
