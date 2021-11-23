@@ -27,8 +27,23 @@ def read_file(energy_valor, path):
         return f(energy_valor)
 
 def cube_phantom(size,energy):
+    coef_air = read_file(energy,'./coefs/coefAtenuacionAir.csv')           
+    coef_water = read_file(energy,'./coefs/coefAtenuacionWater.csv')            
+    coef_soft = read_file(energy,'./coefs/coefAtenuacionSoft.csv')   
 
-    return None
+    # prepare cube coordinates
+    x, y, z = np.indices((size, size, size))
+    
+    cube1 = (x < size/2) & (y < size) & (z < size)
+    cube2 = (x >= size/2) & (y < size) & (z < size)
+    cube3 = ((x >= size/4) & (x<size-size/4)) & ((y >= size/4) & (y<size-size/4)) & ((z >= size/4) & (z<size-size/4))
+
+    # combine the objects into a single boolean array
+    phantom = np.full((size,size,size),coef_air)
+    phantom[cube2] = coef_water
+    phantom[cube3] = coef_soft
+
+    return phantom
 
 def breast_phantom(size,energy):
     return None
