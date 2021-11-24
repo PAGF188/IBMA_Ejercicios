@@ -29,7 +29,10 @@ def plotMiddleLine(img, N0, cellSize):
     plt.show()
 
 def plotCellDistribution(img, numberOfBins):
-    plt.hist(img,numberOfBins, density=True, facecolor='b')
+    #plt.hist(img,numberOfBins, density=True, facecolor='b')
+    
+    hist, bins= np.histogram(img, density=False, bins = numberOfBins)
+    plt.plot(bins, np.insert(hist, 0, hist[0]), '-', drawstyle='steps',linewidth=1)
     return None
 
 N0= 4000000
