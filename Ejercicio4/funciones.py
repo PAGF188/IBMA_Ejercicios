@@ -46,6 +46,8 @@ def plotMiddleLine(img, N0, cellSize):
 def plotCellDistribution(img, numberOfBins):
     hist, bins= np.histogram(img, density=False, bins = numberOfBins)
     plt.plot(bins, np.insert(hist, 0, hist[0]), '-', drawstyle='steps',linewidth=1)
+    plt.xlabel("No. photons")
+    plt.ylabel("No. cells")
     return None
 
 N0= 4000000
