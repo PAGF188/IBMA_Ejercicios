@@ -1,6 +1,7 @@
 import numpy as np
 import pdb
 import matplotlib.pyplot as plt
+from numpy.core.numeric import outer
 
 
 def createNoiseImageN(N0, n, cellSize):
@@ -15,7 +16,19 @@ def createNoiseImageP(N0, n, cellSize):
     return image
 
 def insertNodule(img, noduleSize, noduleContrast, N0, cellSize):
-    return None
+    output = img*1
+    phtons_to_each = N0*cellSize**2
+    photons_nodule = phtons_to_each * noduleContrast/100
+
+    # Posición
+    sy,sx=img.shape
+    x = np.linspace(-sx/2, sx/2,sx)
+    y = np.linspace(-sy/2, sy/2,sy)
+    x, y = np.meshgrid(x, y) 
+    d = np.sqrt(x**2 + y**2)
+    
+    output[d<=noduleSize/2] = img[d<=noduleSize/2] - photons_nodule
+    return output
 
 def plotMiddleLine(img, N0, cellSize):
     # The interval limits at 2*sigma where included in the plot
@@ -26,11 +39,11 @@ def plotMiddleLine(img, N0, cellSize):
     plt.plot(valores)
     plt.axhline(mean+2*sigma, color='black', ls='--')
     plt.axhline(mean-2*sigma, color='black', ls='--')
+    plt.axhline(mean, color='black', ls='-')
+
     plt.show()
 
 def plotCellDistribution(img, numberOfBins):
-    #plt.hist(img,numberOfBins, density=True, facecolor='b')
-    
     hist, bins= np.histogram(img, density=False, bins = numberOfBins)
     plt.plot(bins, np.insert(hist, 0, hist[0]), '-', drawstyle='steps',linewidth=1)
     return None
@@ -39,3 +52,14 @@ N0= 4000000
 n= 100*100   # Suppose a square shape detector
 cellSize= 0.1
 imgDataP= createNoiseImageP(N0, n, cellSize)
+
+# noduleSize= 10
+# noduleContrast= 1
+# imgNodule_2= insertNodule(imgDataP, noduleSize, noduleContrast, N0, cellSize)
+
+# plt.subplot(121)
+# plt.imshow(imgDataP, cmap="gray")
+
+# plt.subplot(122)
+# plt.imshow(imgNodule_2, cmap="gray")
+# plt.show()
