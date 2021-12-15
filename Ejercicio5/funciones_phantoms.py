@@ -27,7 +27,10 @@ def cube_phantom(size,energy):
     coef_air = read_file(energy,'./coefs/coefAtenuacionAir.csv')           
     coef_water = read_file(energy,'./coefs/coefAtenuacionWater.csv')            
     coef_soft = read_file(energy,'./coefs/coefAtenuacionSoft.csv')   
-
+    print("coef_air:", coef_air)
+    print("coef_water:", coef_water)
+    print("coef_soft:", coef_soft)
+    
     # prepare cube coordinates
     x, y, z = np.indices((size, size, size))
     
