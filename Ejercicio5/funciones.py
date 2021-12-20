@@ -1,6 +1,8 @@
 from abc import abstractmethod
 import numpy as np
 import matplotlib.pyplot as plt
+from skimage.util import random_noise
+
 
 
 
@@ -37,18 +39,24 @@ def getNumberCellsPhoton(image, range_):
     return (bins, np.insert(hist, 0, hist[0]))
 
 def getNumberPhotonsCell(image, range_):
-    # # esta aqui
-    unicos = np.unique(image)
-    totales = {}
-    for un in unicos:
-        totales[int(un)] = (len(np.where(image==un)[0]) * un)
-    
+    # esta aqui
     bins = np.array([x for x in range(range_+1)])
-    hist = np.array(bins) * 0
-    for bin in totales.keys():
-        hist[bin] = totales[bin]
-    hist = np.array(hist)
+    hist = bins * 0
+
+    unicos = np.unique(image)
+    dict = {}
+    for unico in unicos:
+        tam = len(np.where(image==unico)[0])
+        hist[int(unico)] = unico * tam
+           
     return (bins, hist)
+    
+    #hist, bins = np.histogram(image, density=False, bins = range, range = (0, range))
+    # print(hist)
+    # print(hist.shape)
+    # print(bins[0:-1])
+    # print(bins[0:-1].shape)
+    return (bins, np.insert(hist, 0, hist[0]) * bins)
 
 def plotDistribution(data, xLabel, yLabel):
     plt.plot(data[0], data[1])
@@ -60,13 +68,30 @@ def plotLineH(qImage, pos):
     line = qImage[:,pos]
     plt.plot(line)
     plt.xlim(0, qImage.shape[0])
+    plt.ylim(0, np.max(qImage)+5)
     plt.xlabel("X position")
     plt.ylabel("GL value")
     plt.show()
 
 def detectorNoiseP(image, n1, n2):
     print("N Cells:", n1, n2)
-    a = np.random.poisson(lam=0.3, size=(n1,n2))
-    print(a)
-    #print(image)
-    return a
+    noisy = np.random.poisson(lam=image, size=(n1,n2))
+    r = np.abs(image - noisy)
+    image = image - r
+    return image
+
+def getContrast(image, fi1, col1, fi2, col2, w):
+    valores = []
+    for i in range(fi1, fi2, w):
+        valores.append(np.mean(np.abs(image[i:i+w, col1] - image[i+w:i+2*w, col2]) / image[i:i+w, col1]))
+    
+    return np.max(valores)
+
+def getSNR(image, a, b, w):
+    media = np.mean(image[a-w:a+w, b-w:b+w])
+    dev = np.std(image[a-w:a+w, b-w:b+w])
+    return media/dev
+
+    #v = image[a-w//2:a+w//2, b-w//2:b+w//2]
+    #return np.mean(np.sqrt(v))
+    
