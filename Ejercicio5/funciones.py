@@ -32,22 +32,26 @@ def interactor_PR(N0, Object, Projection):
 def getNumberPhotons(image):
     return np.sum(image)
 
-def getNumberCellsPhoton(image, range):
-    hist, bins = np.histogram(image, density=False, bins = range, range = (0, range))
+def getNumberCellsPhoton(image, range_):
+    hist, bins = np.histogram(image, density=False, bins = range_, range = (0, range_))
+    return (bins, np.insert(hist, 0, hist[0]))
+
+def getNumberPhotonsCell(image, range_):
+    # # esta aqui
+    unicos = np.unique(image)
+    totales = {}
+    for un in unicos:
+        totales[int(un)] = (len(np.where(image==un)[0]) * un)
+    
+    bins = np.array([x for x in range(range_+1)])
+    hist = np.array(bins) * 0
+    for bin in totales.keys():
+        hist[bin] = totales[bin]
+    hist = np.array(hist)
     return (bins, hist)
 
-def getNumberPhotonsCell(image, range):
-    # esta aqui
-    hist, bins = np.histogram(image, density=False, bins = range, range = (0, range))
-    # print(hist)
-    # print(hist.shape)
-    # print(bins[0:-1])
-    # print(bins[0:-1].shape)
-
-    return (bins, hist * bins[0:-1])
-
 def plotDistribution(data, xLabel, yLabel):
-    plt.plot(data[0], np.insert(data[1], 0, data[1][0]))
+    plt.plot(data[0], data[1])
     plt.xlabel(xLabel)
     plt.ylabel(yLabel)
     plt.show()
