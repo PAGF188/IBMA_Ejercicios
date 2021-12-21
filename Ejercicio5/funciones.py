@@ -1,8 +1,6 @@
-from abc import abstractmethod
 import numpy as np
 import matplotlib.pyplot as plt
 from skimage.util import random_noise
-
 
 
 
@@ -39,24 +37,18 @@ def getNumberCellsPhoton(image, range_):
     return (bins, np.insert(hist, 0, hist[0]))
 
 def getNumberPhotonsCell(image, range_):
-    # esta aqui
-    bins = np.array([x for x in range(range_+1)])
-    hist = bins * 0
 
-    unicos = np.unique(image)
-    dict = {}
-    for unico in unicos:
-        tam = len(np.where(image==unico)[0])
-        hist[int(unico)] = unico * tam
-           
-    return (bins, hist)
+    total = np.sum(image)
+    hist, bins = np.histogram(image, density=False, bins=range_+1, range = (0, range_))
+    hist = np.insert(hist, [hist.size], [0])
+    hist = hist * bins
     
-    #hist, bins = np.histogram(image, density=False, bins = range, range = (0, range))
-    # print(hist)
-    # print(hist.shape)
-    # print(bins[0:-1])
-    # print(bins[0:-1].shape)
-    return (bins, np.insert(hist, 0, hist[0]) * bins)
+    # normalization (Because of the histogram computation of the bins is discrete
+    # so we are loosing some precision:
+    norm_factor = (total - np.sum(hist)) / hist.shape[0]
+    hist = hist + norm_factor
+
+    return (bins, hist)
 
 def plotDistribution(data, xLabel, yLabel):
     plt.plot(data[0], data[1])
@@ -92,6 +84,5 @@ def getSNR(image, a, b, w):
     dev = np.std(image[a-w:a+w, b-w:b+w])
     return media/dev
 
-    #v = image[a-w//2:a+w//2, b-w//2:b+w//2]
-    #return np.mean(np.sqrt(v))
+ 
     
