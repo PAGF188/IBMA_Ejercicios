@@ -69,10 +69,6 @@ def detectorNoiseP(image, n1, n2):
     print("N Cells:", n1, n2)
     noisy = np.random.poisson(lam=0.1*image, size=(n1,n2))
     return image - noisy
-    # noisy = np.random.poisson(lam=image, size=(n1,n2))
-    # r = np.abs(image - noisy)
-    # image = image - r
-    # return image
 
 def getContrast(image, fi1, col1, fi2, col2, w):
     valores = []
