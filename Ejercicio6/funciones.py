@@ -1,8 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from skimage.util import random_noise
 from scipy import interpolate
 import os
+import cv2 as cv
+from skimage.measure import block_reduce
 import pdb
 
 def detector(image, n1, n2):
@@ -11,23 +12,62 @@ def detector(image, n1, n2):
 
     factor_x = x_orig / n1
     factor_y = y_orig / n2
-    print(factor_x, factor_y)
+    print(f"Factores de escalado: {factor_x}, {factor_y}")
 
     nueva = np.zeros((n1,n2))
 
+    # Cuando el detector es de tamaño menor que la quantum image.
     if factor_x>=1 and factor_y>=1:
-        factor_x = int(factor_x)
-        factor_y = int(factor_y)
-        for i,i_ in zip(range(0,n1), range(0,image.shape[0], factor_x)):
-            for j,j_ in zip(range(0,n2), range(0,image.shape[1], factor_y)):
-                nueva[i, j] = np.sum(image[i_:i_+factor_x, j_:j_+factor_y])
+        """Agrupamos bloques de (factor_x,factor_y) size sumando el número de fotones.
+        El número de fotones detectados por cada celda nueva es mayor (es la suma).
+        
+        Ejemplo con factor_x=2, factor_y=2:
+        La imagen:
+            4 4 1 1
+            2 2 3 3 
+            4 4 1 1
+            2 2 3 3 
+        Se transforma en:
+            12 8
+            12 8
+        """
+        nueva = block_reduce(image, (int(factor_x),int(factor_y)), np.sum)
+        # block_reduce() aplica la función np.sum a bloques de tam factor_x, factor_y.
+    
+    # Cuando el detector es de tamaño mayor que la quantum image.
     else:
+        """Dividimos 1 bloque en (factor_x * factor_y) celdas. El numero de fotones detectados
+        por cada celda nueva es menor (está dividido por factor_x * factor_y).
+        
+        Ejemplo con factor_x=0.5, factor_y=0.5 (detector doble de grande):
+        La imagen:
+            12 8
+            12 8
+        Se transforma en:
+            3 3 2 2
+            3 3 2 2
+            3 3 2 2
+            3 3 2 2
+        """
+        # Está hecho de forma vectorizada
+        # Matriz de transformación
         M = np.matrix([[factor_x,0,0],[0,factor_y,0]])
         o_x, o_y = np.indices((n1, n2))  
+        # Generamos los nuevos índices de la imagen detectada
         o_lin_homg_pts = np.stack((o_x.ravel(), o_y.ravel(), np.ones(o_y.size)))
+        # Duplicamos cada valor factor_x * factor_y veces. Es decir generamos el bloque de
+        # factor_x, factor_y celdas para cada elemento.
         im_lin_pts = np.floor(M.dot(o_lin_homg_pts)).astype(int)
         nueva[o_lin_homg_pts[0].astype(int), o_lin_homg_pts[1].astype(int)] = image[im_lin_pts[0],im_lin_pts[1]]
-    
+        # Aplicamos la división para actualizar el nº de fotones de cada celda.
+        nueva = nueva * factor_x * factor_y
+
+    ## Debug
+    print(f"Imagen entrada. Dimension: {image.shape}")
+    print(image[0:8, 0:8])
+    print("\n")
+    print(f"Imagen nueva. Dimension: {nueva.shape}")
+    print(nueva[0:8, 0:8])
     return nueva
 
 def detectorNoiseFullP(image, n1, n2):
@@ -36,17 +76,17 @@ def detectorNoiseFullP(image, n1, n2):
 
     factor_x = x_orig / n1
     factor_y = y_orig / n2
-    print(factor_x, factor_y)
+    print(f"Factores de escalado: {factor_x}, {factor_y}")
 
     nueva = np.zeros((n1,n2))
 
+    # Cuando el detector es de tamaño menor que la quantum image.
     if factor_x>=1 and factor_y>=1:
-        factor_x = int(factor_x)
-        factor_y = int(factor_y)
-        for i,i_ in zip(range(0,n1), range(0,image.shape[0], factor_x)):
-            for j,j_ in zip(range(0,n2), range(0,image.shape[1], factor_y)):
-                nueva[i, j] = np.sum(image[i_:i_+factor_x, j_:j_+factor_y])
+        """Ver explicación en función detector()"""
+        nueva = block_reduce(image, (int(factor_x),int(factor_y)), np.sum)
+    # Cuando el detector es de tamaño mayor que la quantum image.
     else:
+        """Ver explicación en función detector()"""
         M = np.matrix([[factor_x,0,0],[0,factor_y,0]])
         o_x, o_y = np.indices((n1, n2))  
         o_lin_homg_pts = np.stack((o_x.ravel(), o_y.ravel(), np.ones(o_y.size)))
@@ -54,10 +94,12 @@ def detectorNoiseFullP(image, n1, n2):
         nueva[o_lin_homg_pts[0].astype(int), o_lin_homg_pts[1].astype(int)] = image[im_lin_pts[0],im_lin_pts[1]]
         nueva = nueva * factor_x * factor_y
 
+    # Aplicamos el ruido
     for i in range(n1):
         for j in range(n2):
             ruido = np.random.poisson(lam=np.sqrt(nueva[i,j]))
             nueva[i,j] -=  ruido
+
     return nueva
 
 
@@ -65,7 +107,7 @@ def insertArtifact(obj, pos, size, mu):
     shape_ = obj.shape
     coords = np.ogrid[:shape_[0], :shape_[1], :shape_[2]]
     distance = np.sqrt((coords[0] - pos[0])**2 + (coords[1]-pos[1])**2 + (coords[2]-pos[2])**2) 
-    circulo_coordenadas = (distance <= size/2)
+    circulo_coordenadas = (distance <= size/4)
     obj[circulo_coordenadas] = mu
     return obj
 
@@ -133,15 +175,6 @@ def plotLineH(qImage, pos):
     plt.xlabel("X position")
     plt.ylabel("GL value")
     plt.show()
-
-def detectorNoiseP(image, n1, n2):
-    print("N Cells:", n1, n2)
-    noisy = np.random.poisson(lam=0.1*image, size=(n1,n2))
-    return image + noisy
-    # noisy = np.random.poisson(lam=image, size=(n1,n2))
-    # r = np.abs(image - noisy)
-    # image = image - r
-    # return image
 
 def getContrast(image, fi1, col1, fi2, col2, w):
     valores = []

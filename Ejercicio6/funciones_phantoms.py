@@ -81,14 +81,14 @@ def breast_phantom(size,energy):
     at_y = size//4
     at_z = 0
     #at_z = 0
-    phantom[at_x:at_x+adipose_size, at_y:at_y+adipose_size, at_z:at_z+adipose_size+breast_size] = coef_adipose
+    phantom[at_x:at_x+adipose_size-1, at_y:at_y+adipose_size-1, at_z:at_z+adipose_size+breast_size-1] = coef_adipose
     #print((at_z + at_z+adipose_size+breast_size)/2)
     # small right cube
     # small adipose tissue coordinates
     sat_x = (3*size)//8
     sat_y = (3*size)//8
     sat_z = size//2 + size//8
-    phantom[sat_x:sat_x+adipose_size//2, sat_y:sat_y+adipose_size//2, sat_z:sat_z+breast_size+offset] = coef_adipose
+    phantom[sat_x:sat_x+adipose_size//2-1, sat_y:sat_y+adipose_size//2-1, sat_z:sat_z+breast_size+offset-1] = coef_adipose
     #print((sat_z + sat_z+breast_size+offset)/2)
     # add breast tissue inside big left cube
     # breast tissue coordinates
