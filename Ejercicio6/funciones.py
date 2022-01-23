@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import interpolate
 import os
-import cv2 as cv
 from skimage.measure import block_reduce
 import pdb
 
