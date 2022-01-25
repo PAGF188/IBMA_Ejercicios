@@ -47,6 +47,23 @@ def cube_phantom(size,energy):
 
     return phantom
 
+def cube_phantom_cc(size,energy):
+    coef_bone = read_file(energy,'./coefs/coefAtenuacionBone.csv')           
+    coef_soft = read_file(energy,'./coefs/coefAtenuacionSoft.csv')   
+    print("coef_bone:", coef_bone)
+    print("coef_soft:", coef_soft)
+    
+    # prepare cube coordinates
+    x, y, z = np.indices((size, size, size))
+    
+    cube3 = ((x >= size/4) & (x<size-size/4)) & ((y >= size/4) & (y<size-size/4)) & ((z >= size/4) & (z<size-size/4))
+
+    # combine the objects into a single boolean array
+    phantom = np.full((size,size,size),coef_soft)
+    phantom[cube3] = coef_bone
+
+    return phantom
+
 
 def breast_phantom(size,energy):
     coef_air = read_file(energy, './coefs/coefAtenuacionAir.csv')
