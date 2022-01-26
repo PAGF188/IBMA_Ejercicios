@@ -45,5 +45,6 @@ def detector_1D(qImage, angle, nDetectors):
     return aux[angle, j_//2 - nDetectors//2 : j_//2 + nDetectors//2 ]
 
 def process_CT(image, n0):
-    image = np.log(n0/image)
+    aux = np.divide(n0, image, out=np.zeros_like(image), where=image!=0)
+    image = np.log(aux, where=0<(aux), out=np.zeros_like(image))
     return image
