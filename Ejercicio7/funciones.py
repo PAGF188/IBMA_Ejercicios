@@ -39,8 +39,10 @@ def detectSinogram(qImage, nProjections, nDetectors):
 
 
 def detector_1D(qImage, angle, nDetectors):
-    _, j_ = qImage.shape
-    return qImage[angle, j_//2 - nDetectors//2 : j_//2 + nDetectors//2 ]
+    pad = np.zeros((qImage.shape[0],nDetectors))
+    aux = np.concatenate((pad, qImage, pad), axis=1)
+    i_, j_ = aux.shape
+    return aux[angle, j_//2 - nDetectors//2 : j_//2 + nDetectors//2 ]
 
 def process_CT(image, n0):
     image = np.log(n0/image)
