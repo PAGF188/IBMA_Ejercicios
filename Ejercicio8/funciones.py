@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from scipy import ndimage
 from scipy import interpolate
 import os
+import cv2
 import pdb
 
 
@@ -43,8 +44,27 @@ def setHounsfield(Image, eE):
     print(f"Coef agua: {agua}")
     return 1000*(Image-agua)/(agua)
 
-def displayWL(Image, W, L, maxGL):
-    pass
+def displayWL(image, W, L, maxGL):
+    
+    output = image*1
+
+    # Calcular limites ventana
+    rang_min = L-W//2
+    rang_max = L+W//2
+    
+    # Eliminar elementos fuera de la ventana
+    output[image<=rang_min] = 0
+    output[image>=rang_max] = maxGL
+
+    # Transformación lineal para el resto.
+
+    return output
+    
+
+    
+
+
+    #np.interp(a, (a.min(), a.max()), (-1, +1))
 
 ##############################################################3
 # RESTO DE FUNCIONES
