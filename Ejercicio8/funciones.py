@@ -52,23 +52,18 @@ def displayWL(image, W, L, maxGL):
     rang_min = L-W//2
     rang_max = L+W//2
     
+    
+    # Transformación lineal para el resto.
+    # Based on: https://stackoverflow.com/questions/14224535/scaling-between-two-number-ranges
+    output = (image - np.min(image)) * maxGL / (np.max(image)-np.min(image))
+
     # Eliminar elementos fuera de la ventana
     output[image<=rang_min] = 0
     output[image>=rang_max] = maxGL
-
-    # Transformación lineal para el resto.
-
     return output
-    
-
-    
-
-
-    #np.interp(a, (a.min(), a.max()), (-1, +1))
 
 ##############################################################3
 # RESTO DE FUNCIONES
-
 def getCoef(path, eE):
     d = {}
     with open(path, "r") as file:
