@@ -4,9 +4,6 @@ import matplotlib.pyplot as plt
 from scipy import ndimage
 from scipy import interpolate
 import os
-import cv2
-import pdb
-
 
 # x-> ancho; y-> profundo; z->alto
 
@@ -35,7 +32,8 @@ def reconstructor(sinogram, nProj):
         temp = rotate(temp, ang)
         reconstruction += temp
     
-    # Escalado entre 0 y 1:
+    # Escalado entre 0 y 1. Esto se hace porque la normalizacion hecha en la 
+    # practica anterior, es distinta.
     reconstruction = (reconstruction-np.min(reconstruction))/(np.max(reconstruction)-np.min(reconstruction))
     return reconstruction
 
